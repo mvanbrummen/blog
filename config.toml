@@ -5,16 +5,16 @@ theme = "hugo-type-theme"
 # Enable comments by entering your Disqus shortname
 disqusShortname = "mvanbrummen.github.io"
 # Add your tracking code to enable Google Analytics
-googleAnalytics = ""
+googleAnalytics = "UA-86752867-1"
 # Posts per page
 paginate = 10
 
 
 [params]
 	author = "Michael Van Brummen"
-	description = "Enter the psyche of a junior software developer as he embarks on a journey of enlightenment."
+	description = "From the mind and keyboard of MVB..."
 	# The keywords will be added as a meta tag. Delimit them with a comma.
-	keywords = ""
+	keywords = "java,programming,go,golang,software"
 	# Either show custom avatar on the top
 	# left by adding the filename in below
 	avatar = "img/me.jpg"
