@@ -11,11 +11,11 @@ title = "Querying Active Directory in Java using the JNDI"
 
 +++
 
-The Java naming and directory interface (JNDI) provides a way for Java programs to interact with a directory service such as Active Directory. The below example demonstrates how to build a simple object to represent the hierarchy of nested groups and users under a specified group and also handles paging of the search result to accomodate LDAP server request limits. 
+The Java naming and directory interface (JNDI) provides a way for Java programs to interact with a directory service such as Active Directory. The below example demonstrates how to build a simple object to represent the hierarchy of nested groups and users under a specified group and also handles paging of the search result to accomodate LDAP server request limits.
 
 
 
-```
+```java
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,9 +85,9 @@ public class ADObject {
 
 }
 
-``` 
-
 ```
+
+```java
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -103,7 +103,7 @@ import java.util.List;
 public class ADService {
 
     private String baseSearch = "DC=corp,DC=domain,DC=com";
-    private final int PAGE_SIZE = 1000; 
+    private final int PAGE_SIZE = 1000;
     private LdapContext ldapContext;
 
     public ADService() throws Exception {
@@ -174,7 +174,7 @@ public class ADService {
                         cookie = prrc.getCookie();
                     }
                 }
-            } 
+            }
             ldapContext.setRequestControls(new Control[]{new PagedResultsControl(pageSize, cookie, Control.CRITICAL)});
         } while (cookie != null);
         namingEnum.close();
