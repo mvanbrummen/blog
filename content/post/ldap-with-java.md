@@ -1,5 +1,5 @@
 +++
-draft = true
+draft = false
 tags = ["java", "jndi", "active directory"
 ]
 categories = [
