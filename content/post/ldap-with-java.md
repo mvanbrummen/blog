@@ -7,7 +7,7 @@ categories = [
 featureimage = ""
 menu = ""
 date = "2016-11-02T20:16:41+10:00"
-title = "Querying Active Directory in Java using the JNDI"
+title = "Querying Active Directory in Java Using the JNDI"
 
 +++
 
