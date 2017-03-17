@@ -21,7 +21,7 @@ paginate = 10
 	# or use Gravatar by adding your email address to generate a unique avatar
 	gravatar = ""
 
-	headerText = "Currently @Suncorp Group. Interested in Go, open source and startups."
+	headerText = "Currently @CoreLogic. Interested in Scala, Go, open source and startups."
 	# To add a header background to the main site, save your image under static/img/.
 	# If no image path is provided, a orange background will be shown instead.
 	headerImage = ""
