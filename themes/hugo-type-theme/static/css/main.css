@@ -4,3 +4,9 @@
 
 /* see #6 */
 .highlighttable td,th{padding:0;border:0;}td.code{width:95%;}
+
+.post-content img { 
+	-webkit-box-shadow:0 0 10px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow:0 0 10px rgba(0, 0, 0, 0.5);
+	box-shadow:0 0 10px rgba(0, 0, 0, 0.5);
+}
