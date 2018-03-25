@@ -389,7 +389,7 @@ export default class App extends Component {
 ```
 
 
-At this point, the only way to test the app would be to build the frontend and re-compile/run the backend since we use a relative path in the `fetch` http request. We could update the request to call the URL of our backend server (i.e. `http://localhost:8080/spoilers`) but we would run into issues with CORS and a relative path is what we want to use for production. So how can we resolve this issue? 
+At this point, the only way to test the app would be to build the frontend and re-compile/run the backend since we use a relative path in the `fetch` http request. We could update the request to call the URL of our backend server (i.e. `http://localhost:8080/spoiler`) but we would run into issues with CORS and besides, a relative path is what we want to use for production. So how can we resolve this issue? 
 
 We can actually configure the Webpack development server to [proxy requests to our backend](https://www.fullstackreact.com/articles/using-create-react-app-with-a-server/). So our request to `localhost:3000` will get routed to `localhost:8080` and work as intended in development. 
 
@@ -403,7 +403,7 @@ Open up `package.json` and add the following line:
 ```
 
 
-Make sure the backend has started and execute `yarn start` and see the application in action.
+Make sure the backend has started and execute `yarn start` to see the application in action.
 
 
 ![movie-spoiler-app.gif](/img/movie-spoiler-app.gif)
@@ -464,3 +464,103 @@ body {
 Hmmm... still pretty ugly but you get the point!
 
 # Dockerising and Deploying
+
+There is a plethora of deployment options we could consider for our app but I'm going to go with [Docker](https://www.docker.com/). This will provide a nice portable unit of deployment and provide a variety of deployment targets from which to choose from.
+
+Let's Dockerise our majestic application!
+
+First, make sure you have [docker installed](https://docs.docker.com/install/) on your computer, a [Docker hub](https://hub.docker.com/) account (or another Docker registry to push to) and authentication [setup on the CLI](https://docs.docker.com/reference/commandline/cli/#login). 
+
+We'll be using the [sbt-native-packager](https://github.com/sbt/sbt-native-packager) SBT plugin to package the app which allows us to package our SBT project into various formats including Docker images.
+
+Open up `project/plugins.sbt` and add the following line.
+
+```scala
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.3.3")
+```
+
+In `build.sbt` we will make the following updates.
+
+```scala
+lazy val backend = project
+  .enablePlugins(JavaAppPackaging) // required for docker packaging
+  .settings(
+    inThisBuild(List(
+      organization    := "com.example",
+      scalaVersion    := "2.12.4"
+    )),
+    name := "movie-spoiler-app",
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-http"            % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http-xml"        % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-stream"          % akkaVersion,
+
+      "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
+      "com.typesafe.akka" %% "akka-testkit"         % akkaVersion     % Test,
+      "com.typesafe.akka" %% "akka-stream-testkit"  % akkaVersion     % Test,
+      "org.scalatest"     %% "scalatest"            % "3.0.1"         % Test
+    ),
+    dockerRepository := Some("docker.io"), // docker hub
+    dockerUsername := Some("mvanbrummen") // your docker hub username
+  )
+```
+
+Make sure the frontend is built and then run the following.
+
+```bash
+$ sbt
+> project backend
+> compile
+> docker:publishLocal
+```
+
+You should now see the new Docker image locally which you should be able to run as a container.
+
+```bash
+$ docker images
+REPOSITORY                                                        TAG                 IMAGE ID            CREATED             SIZE
+mvanbrummen/movie-spoiler-app                                     0.1-SNAPSHOT        8c1ad98dc77e        26 seconds ago      759MB
+$ docker run -p 8080:8080 -it -d 8c1ad98dc77e
+$ curl localhost:8080
+{
+  movieTitle: "The Sixth Sense",
+  spoiler: "Bruce Willis was dead the whole time"
+}
+
+```
+
+Now run the publish task to push the image to the Docker registry.
+
+```bash
+$ sbt
+> project backend
+> docker:publish
+```
+
+We can now run our container in AWS, Google Cloud, Docker Cloud etc. but I'll be deploying to [Hyper.sh](https://www.hyper.sh/) as it provides direct container hosting, saves us from having to worry about host/cluster resources and they have a 2 month free trial period.
+
+Sign up to Hyper and follow the [getting started guide](https://docs.hyper.sh/GettingStarted/index.html) to setup the `hyper` CLI.
+
+Now run the following commands (with your docker username substituted).
+
+```
+$ hyper pull mvanbrummen/movie-spoiler-app:0.1-SNAPSHOT
+$ hyper run -d -p 80:8080 --name movie-spoiler-app mvanbrummen/movie-spoiler-app:0.1-SNAPSHOT
+$ hyper fip allocate 1
+$ hyper fip attach 209.177.87.17 movie-spoiler-app
+
+```
+
+As you can see the hyper CLI provides commands consistent with Docker. We just have to pull our image and run the container, exposing appliction port 8080 in the container to default port 80 on the host. Then if we want to route external traffic to app we just have to allocate an IP and attach it to our container. Navigate to the IP address and you should see your application in all its glory. 
+
+You can take this even further by configurng for high availability/scalability, setting up a domain name, TLS, deployment pipleine etc. but I'll leave that as an exercise for the reader.
+
+# Conclusion
+
+We built a Scala/Akka HTTP backend API, hosted a static ReactJS frontend, Dockerised the application and deployed to a container hosting platform - all with relative ease. This example was quite trivial but hopefully you got something out of it and if anything, are inspired to go build something cool!    
+
+Happy hacking!
+
+*Full source code can be viewed [here](https://github.com/mvanbrummen/movie-spoiler-app).*
+
