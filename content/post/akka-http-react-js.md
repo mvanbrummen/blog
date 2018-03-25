@@ -249,7 +249,7 @@ Awesome! I can already hear ['Gonna Fly Now'](https://www.youtube.com/watch?v=io
 
 Since I haven't attained my PhD in Webpack configuration, we'll use [create-react-app](https://github.com/facebook/create-react-app) to bootstrap the ReactJS project into a new folder named frontend.
 
-```
+```bash
 $ npm install -g create-react-app
 $ create-react-app frontend  
 $ ls
@@ -258,7 +258,7 @@ backend         build.sbt       frontend        project         target
 
 Starting up the app with `yarn start` should result in the familiar create-react-app frontend.
 
-```
+```bash
 $ cd frontend
 $ yarn start
 Compiled successfully!
